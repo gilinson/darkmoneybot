@@ -371,6 +371,7 @@ def fetch_data_and_build_tweets(min_load_date, min_amount, transactions, **kwarg
     :param kwargs:
     :return:
     """
+    logging.info('Starting fetch_data_and_build_tweets')
     schedule_as = get_schedule_a(min_load_date=min_load_date, min_amount=min_amount, **kwargs)
     tweets = []
 
@@ -399,4 +400,5 @@ def fetch_data_and_build_tweets(min_load_date, min_amount, transactions, **kwarg
             continue
 
         tweets.append(tweet)
+    logging.info('Completed fetch_data_and_build_tweets')
     return tweets
