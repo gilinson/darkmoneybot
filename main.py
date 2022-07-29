@@ -1,16 +1,28 @@
-# This is a sample Python script.
+import csv
+from datetime import datetime, timedelta
+from fec_api import get_schedule_a, get_committee, get_affiliated_committees, get_party, get_candidate
+from twitter import fetch_data_and_build_tweets, TweetStatus
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+# Runs once per day #TODO update to hourly, will need to track what has been posted
+min_date = datetime.now() - timedelta(days=1)
+transactions = []
+with open('transactions.csv', 'r') as csv_file:
+    reader_obj = csv.reader(csv_file)
+    # Iterate over each row in the csv
+    # file using reader object
+    for row in reader_obj:
+        transactions.append(row[0])
+
+tweets = fetch_data_and_build_tweets(min_load_date=min_date.strftime('%Y-%m-%d'), min_amount=1e6, transactions=transactions)
+
+for tweet in tweets:
+    if tweet.status == TweetStatus.PENDING:
+        tweet.post()
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+#TODO
+# 1. shorten URL
+# 2. tweet class
+# 3. wikipedia intergration
+# 4. Get pictures from website of committee
+# 5. Generate pictures
