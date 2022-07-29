@@ -238,7 +238,7 @@ class Tweet:
         self.disclosure_url = self.schedule_a['pdf_url']
 
     def build_hashtags(self):
-        self.hashtags.append('Election2020')
+        self.hashtags.append('Election2022')
         if self.state_name is not None and self.state_name != 'US':
             self.hashtags.append(self.state_name.replace(' ', ''))
         if self.state_name is not None and self.state_name != 'US' and self.office is not None:
