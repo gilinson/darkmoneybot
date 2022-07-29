@@ -4,6 +4,8 @@ import requests
 import tweepy
 import locale
 import re
+import sys
+import logging
 from bs4 import BeautifulSoup
 from fec_api import get_schedule_a, get_committee, get_affiliated_committees, get_party, get_candidate
 from open_secrets import get_committee_info
@@ -11,8 +13,7 @@ from states import abbrev_to_us_state
 from credentials import twitter_keys
 
 locale.setlocale(locale.LC_ALL, 'en_CA.UTF-8')
-# from credentials import API_key, API_secret_key, access_token, access_token_secret
-
+logging.basicConfig(format='%(asctime)s: %(message)s', stream=sys.stdout, level=logging.INFO)
 
 base_string = """According to a new filing {contributor_name} gave {amount} to {recipient}, {recipient_description}.
 
@@ -381,7 +382,7 @@ def fetch_data_and_build_tweets(min_load_date, min_amount, transactions, **kwarg
         # No duplicates
         if tweet.transaction_id in transactions:
             tweet.status = TweetStatus.BLOCKED
-            print(f'Skipping already posted transaction: {tweet.transaction_id}')
+            logging.info(f'Skipping already posted transaction: {tweet.transaction_id}')
             continue
         try:
             tweet.get_committee_media()
