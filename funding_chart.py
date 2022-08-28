@@ -82,7 +82,7 @@ def agg_by_funder(schedule_as, calling_committee):
             else:
                 funder = Individual(
                     name=schedule_a['contributor_name'],
-                    first_name = schedule_a['contributor_first_name'],
+                    first_name=schedule_a['contributor_first_name'],
                     last_name=schedule_a['contributor_last_name']
                 )
                 funders.append(funder)
@@ -229,7 +229,7 @@ imagescale=15;
 
     graph = template.format(
         nodes='\n'.join(nodes),
-        edges = '\n'.join(edges),
+        edges='\n'.join(edges),
     )
     r = requests.post('https://quickchart.io/graphviz', json={'graph': graph, 'format': 'svg'})
     filename_base = './tmp_img'
@@ -290,4 +290,3 @@ def generate_committee_chart(committee_name, committee_id, support_oppose, spend
     formated_amount = format_amount(spend_amount)
     filename = generate_graphviz_via_api(nodes, edges, upper=f'How {committee.committee_name} Spent {formated_amount} to {support_oppose}', lower=candidate.candidate_name)
     return filename
-
