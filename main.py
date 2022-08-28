@@ -50,7 +50,6 @@ if __name__ == "__main__":
         else:
             logging.info(f'Skipping {tweet.transaction_id} because {tweet.build_issues}')
 
-    min_load_date = datetime.now() - timedelta(days=3)
     tweets_e = fetch_schedule_e_data_and_build_tweets(
         min_filing_date=min_file_date.strftime('%Y-%m-%d'),
         min_load_date=min_load_date.strftime('%Y-%m-%d'),
