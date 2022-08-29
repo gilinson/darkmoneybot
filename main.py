@@ -3,7 +3,6 @@ import sys
 import argparse
 import logging
 from datetime import datetime, timedelta
-from fec_api import get_schedule_a, get_committee, get_affiliated_committees, get_party, get_candidate
 from twitter import fetch_schedule_a_data_and_build_tweets, fetch_schedule_e_data_and_build_tweets, TweetStatus
 
 
@@ -17,6 +16,7 @@ if __name__ == "__main__":
 
     logging.info(f'Run level: {run_level}')
     min_load_date = datetime.now() - timedelta(days=1)
+    min_dis_date = datetime.now() - timedelta(days=7)
     min_file_date = datetime.now() - timedelta(days=14)
 
     total_posts = 0
@@ -53,11 +53,10 @@ if __name__ == "__main__":
     tweets_e = fetch_schedule_e_data_and_build_tweets(
         min_filing_date=min_file_date.strftime('%Y-%m-%d'),
         min_load_date=min_load_date.strftime('%Y-%m-%d'),
-        min_dissemination_date=min_load_date.strftime('%Y-%m-%d'),
-        min_amount=1e5,
+        min_dissemination_date=min_dis_date.strftime('%Y-%m-%d'),
+        min_amount=3e5,
         transactions=transactions
     )
-
 
     for tweet in tweets_e:
         if total_posts > POST_CAP:
