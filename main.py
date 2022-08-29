@@ -54,7 +54,7 @@ if __name__ == "__main__":
         min_filing_date=min_file_date.strftime('%Y-%m-%d'),
         min_load_date=min_load_date.strftime('%Y-%m-%d'),
         min_dissemination_date=min_dis_date.strftime('%Y-%m-%d'),
-        min_amount=3e5,
+        min_amount=1e5,
         transactions=transactions
     )
 
