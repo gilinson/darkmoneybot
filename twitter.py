@@ -65,9 +65,8 @@ class Tweet:
                 self.response = client.create_tweet(text=self.text, media_ids=media_ids, in_reply_to_tweet_id=self.in_reply_to_tweet_id)
                 self.status = TweetStatus.POSTED
             else:
-                pass # for now skip text only
-                #self.response = client.create_tweet(text=self.text)
-                #self.status = TweetStatus.POSTED
+                self.response = client.create_tweet(text=self.text)
+                self.status = TweetStatus.POSTED
             if len(self.response.errors) == 0:
                 with open('transactions.csv', 'a') as csv_file:
                     writer_object = csv.writer(csv_file)
