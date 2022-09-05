@@ -1,4 +1,4 @@
-from fec_api import get_candidate, get_schedule_e, get_schedule_a
+from fec_api import get_schedule_a
 from math import log
 import locale
 import requests
@@ -180,6 +180,7 @@ def gen_nodes(obj, min_amount_direct, min_amount_indirect):
 
 
 def format_amount(amount):
+    amount = round(amount)
     if amount >= 1e6:
         end = 'M'
         amount = round(amount / 1e6, 1)

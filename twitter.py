@@ -782,7 +782,7 @@ def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing
                                  **kwargs)
     tweets = []
     logging.info(f'Retrieved {len(schedule_es)} transactions')
-    for schedule_e in schedule_es[20:25]:
+    for schedule_e in schedule_es:
         tweet = ScheduleETweet(schedule_e=schedule_e)
         # No duplicates
         if tweet.transaction_id in transactions:
