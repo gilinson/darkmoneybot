@@ -138,6 +138,7 @@ def get_funders(committee, min_amount=1e5):
 
 def gen_edges(obj, min_amount_direct, min_amount_indirect):
     edges = []
+    obj.funders.sort(key=lambda x: x.amount, reverse=True)
     for funder in obj.funders:
         if funder.amount < min_amount_direct:
             continue
@@ -164,7 +165,7 @@ def gen_edges(obj, min_amount_direct, min_amount_indirect):
 
 def gen_nodes(obj, min_amount_direct, min_amount_indirect):
     nodes = []
-    obj.funders = obj.funders.sort(key=lambda x: x.amount, reverse=True)
+    obj.funders.sort(key=lambda x: x.amount, reverse=True)
     for funder in obj.funders:
         if funder.amount < min_amount_direct:
             continue
@@ -246,7 +247,7 @@ imagescale=15;
     draw = ImageDraw.Draw(img)
     draw.fontmode = 'L'
     req = requests.get("https://github.com/googlefonts/roboto/blob/main/src/hinted/Roboto-Regular.ttf?raw=true")
-    font_size = round(1.8 * (img.width - 2 * padding) / len(upper))
+    font_size = round(1.5 * (img.width - 2 * padding) / len(upper))
     font = ImageFont.truetype(BytesIO(req.content), font_size)
 
     draw.text((padding + 30, 10), upper + '\n' + lower, fill='black', font=font)
