@@ -763,6 +763,7 @@ def format_committee_name(committee_name):
     committee_name = re.sub(r'\b(pac)\b', 'PAC', committee_name, flags=re.IGNORECASE)  # Capitalize PAC
     committee_name = re.sub(r'\b(usa)\b', 'USA', committee_name, flags=re.IGNORECASE)  # Capitalize USA
     committee_name = re.sub(r'\b(nra)\b', 'NRA', committee_name, flags=re.IGNORECASE)  # Capitalize NRA
+    committee_name = re.sub(r'\b(goa)\b', 'GOA', committee_name, flags=re.IGNORECASE)  # Capitalize GOA
 
     return committee_name
 
