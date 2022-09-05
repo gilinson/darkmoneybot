@@ -164,6 +164,7 @@ def gen_edges(obj, min_amount_direct, min_amount_indirect):
 
 def gen_nodes(obj, min_amount_direct, min_amount_indirect):
     nodes = []
+    obj.funders = obj.sort(key=lambda x: x.amount, reverse=True)
     for funder in obj.funders:
         if funder.amount < min_amount_direct:
             continue
