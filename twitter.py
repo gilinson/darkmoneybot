@@ -338,7 +338,7 @@ FEC filing: {short_url}
 
         # TODO clean up this very hacky fix
         if len(self.text) > 280:
-            logging.info(f'Removing link because tween is too long. {self.short_url}')
+            logging.info(f'Removing link because tweet is too long. {self.short_url}')
             self.text = self.base_string_no_disclosure_url.format(
                 contributor_name=self.contributor_name,
                 amount=self.amount,
@@ -350,10 +350,19 @@ FEC filing: {short_url}
             if self.emoji is not None:
                 self.text = self.emoji + ' ' + self.text
 
+        if len(self.text) > 280:
+            logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
+            self.text = self.base_string_no_disclosure_url.format(
+                contributor_name=self.contributor_name,
+                amount=self.amount,
+                recipient=self.recipient,
+                recipient_description=self.recipient_description,
+                hashtags=''
+            )
             self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
 
-        if len(self.text) > 280:
-            self.handle_build_error('Tweet is too long.')
+            if len(self.text) > 280:
+                self.handle_build_error('Cannot shorten tweet.')
 
     def get_committee_media(self):
         committee = get_committee(committee_id=self.schedule_a['committee_id'])
@@ -406,12 +415,12 @@ FEC filing: {short_url}
 
 
 class ScheduleETweet(Tweet):
-    base_string = """{emoji} {committee_name} just disclosed they spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}
+    base_string = """{emoji} {committee_name} spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}
 
 FEC filing: {short_url}
 {hashtags}
 """
-    base_string_no_disclosure_url = """{emoji} {committee_name} just disclosed they spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}
+    base_string_no_disclosure_url = """{emoji} {committee_name} spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}
 
     {hashtags}
     """
@@ -531,12 +540,16 @@ FEC filing: {short_url}
             self.handle_build_error('Element missing for candidate description.')
             return
 
+        if self.party == 'Unknown':
+            self.party = ''
+
         if self.office == 'House':
             self.candidate_description = f'{self.party} candidate for the {self.office} in {self.state_name}'
         elif self.office == 'Senate':
             self.candidate_description = f'{self.party} candidate for {self.office} in {self.state_name}'
         elif self.office == 'President':
             self.candidate_description = f'{self.party} candidate for President'
+        self.candidate_description = self.candidate_description.strip()
 
     def build_os(self):
         if self.schedule_e['support_oppose_indicator'] == 'O':
@@ -571,7 +584,7 @@ FEC filing: {short_url}
         self.reason = re.sub(r'\(.*\)', '', self.reason).replace('  ', ' ').strip()
         self.reason = re.sub(r'-', '', self.reason).replace('  ', ' ').strip()
         self.reason = self.reason.replace('ie ', ' ').strip()
-        self.reason = re.sub(r'estimate.{?}', '', self.reason).replace('  ', ' ').strip()
+        self.reason = re.sub(r'estimate.{0,1}', '', self.reason, flags=re.IGNORECASE).replace('  ', ' ').strip()
 
         # Should we add an S?
         if re.search(r'.*ing$', self.reason, flags=re.IGNORECASE) is None and \
@@ -583,21 +596,29 @@ FEC filing: {short_url}
         rep_emoji = "🚨🐘💸"
         dem_emoji = "️🗳️🐴💸"
         ind_emoji = "⭐💸"
-        if self.party == 'Republican':
+
+        # Search open secrets for information on outside funding group
+        self.lean, os_candidate_name, os_state, os_party = get_committee_info(
+            self.schedule_e['committee_id'],
+            2022  # TODO don't hardcode
+        )
+
+        if self.party == 'Republican' or self.lean == 'conservative':
             if self.os == 'support':
                 self.emoji = rep_emoji
             elif self.os == 'oppose':
                 self.emoji = dem_emoji
-        elif self.party == 'Democratic':
+        elif self.party == 'Democratic' or self.lean == 'liberal':
             if self.os == 'support':
                 self.emoji = dem_emoji
             elif self.os == 'oppose':
                 self.emoji = rep_emoji
-        elif self.party == 'Independent':
+        elif self.party == 'Independent' or self.lean == 'non-partisan':
             self.emoji = ind_emoji
 
         if self.emoji is None:
-            self.handle_build_error('Cannot determine emoji')
+            self.emoji = '💸'
+            logging.info(f'Cannot determine emoji for candidate {self.candidate_name} of party {self.party}')
 
     def build_tweet_string(self):
 
@@ -616,7 +637,7 @@ FEC filing: {short_url}
 
         # TODO clean up this very hacky fix
         if len(self.text) > 280:
-            logging.info(f'Removing link because tween is too long. {self.short_url}')
+            logging.info(f'Removing link because tweet is too long. {self.short_url}')
             self.text = self.base_string_no_disclosure_url.format(
                 committee_name=self.committee_name,
                 amount=self.amount,
@@ -630,7 +651,21 @@ FEC filing: {short_url}
             )
 
         if len(self.text) > 280:
-            self.handle_build_error('Tweet is too long.')
+            self.text = self.base_string_no_disclosure_url.format(
+                committee_name=self.committee_name,
+                amount=self.amount,
+                date=self.date,
+                candidate_name=self.candidate_name,
+                candidate_description=self.candidate_description,
+                os=self.os,
+                hashtags='',
+                reason=self.reason,
+                emoji=self.emoji
+            )
+            logging.info(f'Removing hashtags because tweet is too long. {self.hashtags}')
+
+        if len(self.text) > 280:
+            self.handle_build_error(f'Tweet is too long: {self.text}')
 
         self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
 
@@ -714,13 +749,20 @@ def format_committee_name(committee_name):
             not re.search(r'^the', committee_name, flags=re.IGNORECASE):
         committee_name = 'The ' + committee_name
 
+    # remove anything in parens
+    committee_name = re.sub(r'\(.*\)', '', committee_name).replace('  ', ' ')
+
+    # remove anything with dba and after
+    committee_name = re.sub(r'\sdba.*$', '', committee_name, flags=re.IGNORECASE)
+
     # Should the entire name be capitalized?
     # When its one word
     if re.search(r'^\w+$', committee_name) is not None:
         committee_name = committee_name.upper()
 
     committee_name = re.sub(r'\b(pac)\b', 'PAC', committee_name, flags=re.IGNORECASE)  # Capitalize PAC
-    committee_name = re.sub(r'\b(USA)\b', 'PAC', committee_name, flags=re.IGNORECASE)  # Capitalize USA
+    committee_name = re.sub(r'\b(usa)\b', 'USA', committee_name, flags=re.IGNORECASE)  # Capitalize USA
+    committee_name = re.sub(r'\b(nra)\b', 'NRA', committee_name, flags=re.IGNORECASE)  # Capitalize NRA
 
     return committee_name
 
