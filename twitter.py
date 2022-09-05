@@ -559,6 +559,8 @@ FEC filing: {short_url}
 
         self.reason = to_lower(self.schedule_e['expenditure_description'])
         self.reason = re.sub(r'\(.*\)', '', self.reason).replace('  ', ' ').strip()
+        self.reason = self.reason.replace('- estimates', '').strip()
+
         # Should we add an S?
         if re.search(r'.*ing$', self.reason, flags=re.IGNORECASE) is None and \
                 re.search(r'.*s$', self.reason, flags=re.IGNORECASE) is None and \
