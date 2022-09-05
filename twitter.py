@@ -680,7 +680,7 @@ FEC filing: {short_url}
         )
 
         reply_tweet.upload_media_from_file(filename)
-        reply_tweet.text = f'How did {self.committee_name} raise money to {self.os} {self.candidate_name}?'
+        reply_tweet.text = f'How {self.committee_name} raised {self.amount} to {self.os} {self.candidate_name} 👇'
         reply_tweet.in_reply_to_tweet_id = self.response.data['id']
         return reply_tweet
 

@@ -242,7 +242,7 @@ imagescale=15;
     renderPM.drawToFile(drawing, filename_base + '.png')
 
     img = Image.open(filename_base + '.png')
-    padding = img.height // 4
+    padding = img.height // 4 + 25
     img = ImageOps.expand(img, border=padding, fill='white')
     draw = ImageDraw.Draw(img)
     draw.fontmode = 'L'
@@ -291,5 +291,5 @@ def generate_committee_chart(committee_name, committee_id, support_oppose, spend
     edges += list(set(edges_c))
     nodes += list(set(nodes_c))
     formated_amount = format_amount(spend_amount)
-    filename = generate_graphviz_via_api(nodes, edges, upper=f'How {committee.committee_name} Spent {formated_amount} to {support_oppose}', lower=candidate.candidate_name)
+    filename = generate_graphviz_via_api(nodes, edges, upper=f'Where did {committee.committee_name} get {formated_amount}', lower=f'to {support_oppose} {candidate.candidate_name}?')
     return filename
