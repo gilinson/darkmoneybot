@@ -9,7 +9,7 @@ import os
 import logging
 import titlecase
 from bs4 import BeautifulSoup
-from PIL import Image, ImageFont, ImageDraw, ImageOps
+from PIL import Image, ImageOps
 from datetime import datetime
 import credentials
 from fec_api import get_schedule_a, get_schedule_e, get_committee, get_affiliated_committees, get_party, get_candidate
@@ -499,7 +499,17 @@ FEC filing: {short_url}
         self.date = dt.strftime('%b {S}').replace('{S}', str(dt.day) + suffix(dt.day))
 
     def build_candidate(self):
-        candidate = get_candidate(candidate_id=self.schedule_e['candidate_id'])
+        if self.schedule_e['candidate_id'] is not None:
+            candidate = get_candidate(candidate_id=self.schedule_e['candidate_id'])
+        else:
+            candidate = get_candidate(
+                name='{first_name} {last_name}'.format(
+                    first_name=self.schedule_e['candidate_first_name'],
+                    last_name=self.schedule_e['candidate_last_name']
+                ),
+                state=self.schedule_e['candidate_office_state']
+            )
+
         self.candidate_first_name = to_title(candidate['first_name'])
         self.candidate_last_name = to_title(candidate['last_name'])
         self.candidate_name = f'{self.candidate_first_name} {self.candidate_last_name}'
@@ -559,7 +569,9 @@ FEC filing: {short_url}
 
         self.reason = to_lower(self.schedule_e['expenditure_description'])
         self.reason = re.sub(r'\(.*\)', '', self.reason).replace('  ', ' ').strip()
-        self.reason = self.reason.replace('- estimates', '').strip()
+        self.reason = re.sub(r'-', '', self.reason).replace('  ', ' ').strip()
+        self.reason = self.reason.replace('ie ', ' ').strip()
+        self.reason = re.sub(r'estimate.{?}', '', self.reason).replace('  ', ' ').strip()
 
         # Should we add an S?
         if re.search(r'.*ing$', self.reason, flags=re.IGNORECASE) is None and \
@@ -714,6 +726,7 @@ def format_committee_name(committee_name):
 
 
 def format_amount(amount):
+    amount = round(amount)
     if amount >= 1e6:
         end = 'M'
         amount = round(amount / 1e6, 1)
@@ -769,7 +782,7 @@ def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing
                                  **kwargs)
     tweets = []
     logging.info(f'Retrieved {len(schedule_es)} transactions')
-    for schedule_e in schedule_es:
+    for schedule_e in schedule_es[20:25]:
         tweet = ScheduleETweet(schedule_e=schedule_e)
         # No duplicates
         if tweet.transaction_id in transactions:
