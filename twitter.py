@@ -77,11 +77,16 @@ class Tweet:
             logging.info(f'In debug mode, not posting. Post would have {len(self.media_objs)} media')
 
     def upload_media_from_url(self, media_url, adjust_aspect=False):
+        if len(media_url) == 0:
+            logging.info(f'Empty media URL')
+            return
         if self.status != TweetStatus.BLOCKED:
             opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             urllib.request.install_opener(opener)
             filename = './' + media_url.split('/')[len(media_url.split('/')) - 1]
+            # remove anything strange in filename
+            filename = re.sub(r'(?<=png|jpg|bmp).*$', '', filename)
             if 'blank' in filename:
                 # TODO could be some better quality check
                 logging.info(f'Not uploading possible blank {media_url}')
