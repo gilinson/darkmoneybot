@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     logging.info(f'Run level: {run_level}')
     min_load_date = datetime.now() - timedelta(days=1)
-    min_dis_date = datetime.now() - timedelta(days=7)
+    min_dis_date = datetime.now() - timedelta(days=3)
     min_file_date = datetime.now() - timedelta(days=14)
 
     total_posts = 0
@@ -34,17 +34,14 @@ if __name__ == "__main__":
        min_load_date=min_load_date.strftime('%Y-%m-%d'),
        min_amount=2.5e5,
        contributor_type='individual',
-       transactions=transactions
+       transactions=transactions,
+       post_cap=POST_CAP
     )
 
     for tweet in tweets_a:
-        if total_posts > POST_CAP:
-            logging.info(f'Hit Post Cap')
-            break
         if tweet.status == TweetStatus.PENDING:
             try:
                 tweet.post(run_level=run_level)
-                total_posts += 1
             except Exception as error:
                 logging.info(error)
         else:
@@ -55,17 +52,14 @@ if __name__ == "__main__":
         min_load_date=min_load_date.strftime('%Y-%m-%d'),
         min_dissemination_date=min_dis_date.strftime('%Y-%m-%d'),
         min_amount=1e5,
-        transactions=transactions
+        transactions=transactions,
+        post_cap=POST_CAP
     )
 
     for tweet in tweets_e:
-        if total_posts > POST_CAP:
-            logging.info(f'Hit Post Cap')
-            break
         if tweet.status == TweetStatus.PENDING:
             try:
                 tweet.post(run_level=run_level)
-                total_posts += 1
             except Exception as error:
                 logging.info(error)
         else:

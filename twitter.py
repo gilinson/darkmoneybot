@@ -67,12 +67,11 @@ class Tweet:
             else:
                 self.response = client.create_tweet(text=self.text)
                 self.status = TweetStatus.POSTED
-            if len(self.response.errors) == 0:
-                with open('transactions.csv', 'a') as csv_file:
-                    writer_object = csv.writer(csv_file)
-                    writer_object.writerow([self.transaction_id])
-            else:
+            if len(self.response.errors) > 0:
                 logging.info(self.response.errors)
+            with open('transactions.csv', 'a') as csv_file:
+                writer_object = csv.writer(csv_file)
+                writer_object.writerow([self.transaction_id])
         else:
             logging.info(f'In debug mode, not posting. Post would have {len(self.media_objs)} media')
 
@@ -785,18 +784,21 @@ def format_amount(amount):
     return locale.currency(amount, grouping=True).rstrip('0').rstrip('.') + end
 
 
-def fetch_schedule_a_data_and_build_tweets(min_load_date, min_amount, transactions, **kwargs):
+def fetch_schedule_a_data_and_build_tweets(min_load_date, min_amount, transactions, post_cap, **kwargs):
     """
-
     :param transactions:
     :param min_load_date:
     :param min_amount:
+    :param post_cap:
     :param kwargs:
     :return:
     """
     logging.info('Starting fetch_schedule_a_data_and_build_tweets')
     schedule_as = get_schedule_a(min_load_date=min_load_date, min_amount=min_amount, **kwargs)
+
     tweets = []
+    total_posts = 0
+
     logging.info(f'Retrieved {len(schedule_as)} transactions')
     for schedule_a in schedule_as:
         tweet = ScheduleATweet(schedule_a=schedule_a)
@@ -805,9 +807,12 @@ def fetch_schedule_a_data_and_build_tweets(min_load_date, min_amount, transactio
             tweet.status = TweetStatus.BLOCKED
             logging.info(f'Skipping already posted transaction: {tweet.transaction_id}')
             continue
-
+        if total_posts == post_cap:
+            logging.info(f'Hit Post Cap')
+            break
         try:
             tweet.build()
+            total_posts += 1
         except Exception as error:
             tweet.handle_build_error('Unknown error: ' + str(error))
         tweets.append(tweet)
@@ -816,13 +821,13 @@ def fetch_schedule_a_data_and_build_tweets(min_load_date, min_amount, transactio
     return tweets
 
 
-def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing_date, transactions, **kwargs):
+def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing_date, transactions, post_cap, **kwargs):
     """
-
     :param min_filing_date:
     :param transactions:
     :param min_load_date:
     :param min_amount:
+    :param post_cap:
     :param kwargs:
     :return:
     """
@@ -830,6 +835,8 @@ def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing
     schedule_es = get_schedule_e(min_load_date=min_load_date, min_filing_date=min_filing_date, min_amount=min_amount,
                                  **kwargs)
     tweets = []
+    total_posts = 0
+
     logging.info(f'Retrieved {len(schedule_es)} transactions')
     for schedule_e in schedule_es:
         tweet = ScheduleETweet(schedule_e=schedule_e)
@@ -838,8 +845,12 @@ def fetch_schedule_e_data_and_build_tweets(min_load_date, min_amount, min_filing
             tweet.handle_build_error('Duplicate transaction')
             logging.info(f'Skipping already posted transaction: {tweet.transaction_id}')
             continue
+        if total_posts == post_cap:
+            logging.info(f'Hit Post Cap')
+            break
         try:
             tweet.build()
+            total_posts += 1
         except Exception as error:
             tweet.handle_build_error('Unknown error: ' + str(error))
         tweets.append(tweet)
