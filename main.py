@@ -20,7 +20,7 @@ if __name__ == "__main__":
     min_file_date = datetime.now() - timedelta(days=14)
 
     total_posts = 0
-    POST_CAP = 3
+    POST_CAP = 100
 
     transactions = []
     with open('transactions.csv', 'r') as csv_file:

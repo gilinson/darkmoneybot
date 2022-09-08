@@ -62,13 +62,13 @@ class Tweet:
             if len(self.media_objs) > 0:
                 media_ids = [obj.media_id for obj in self.media_objs]
                 logging.info(f'Posting with {len(media_ids)} attachments')
-                self.response = client.create_tweet(text=self.text, media_ids=media_ids, in_reply_to_tweet_id=self.in_reply_to_tweet_id)
+                #self.response = client.create_tweet(text=self.text, media_ids=media_ids, in_reply_to_tweet_id=self.in_reply_to_tweet_id)
                 self.status = TweetStatus.POSTED
             else:
-                self.response = client.create_tweet(text=self.text)
+                #self.response = client.create_tweet(text=self.text)
                 self.status = TweetStatus.POSTED
-            if len(self.response.errors) > 0:
-                logging.info(self.response.errors)
+            #if len(self.response.errors) > 0:
+            #    logging.info(self.response.errors)
             with open('transactions.csv', 'a') as csv_file:
                 writer_object = csv.writer(csv_file)
                 writer_object.writerow([self.transaction_id])
