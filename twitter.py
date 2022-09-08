@@ -161,7 +161,8 @@ FEC filing: {short_url}
         self.candidate_last_name = None
         self.candidate_description = None
         self.committee_website = None
-        self.transaction_id = self.schedule_a['transaction_id']
+        self.transaction_id = self.transaction_id = f"{self.schedule_a['transaction_id']}{self.schedule_a['committee']['committee_id']}-{self.schedule_a['contribution_receipt_amount']}"
+
 
     def build_contributor_name(self):
         """
@@ -453,7 +454,7 @@ FEC filing: {short_url}
         self.candidate_last_name = None
         self.candidate_description = None
         self.committee_website = None
-        self.transaction_id = self.schedule_e['transaction_id']
+        self.transaction_id = f"{self.schedule_e['transaction_id']}{self.schedule_e['committee_id']}-{self.schedule_e['candidate_id']}-{self.schedule_e['expenditure_amount']}"
 
     def build(self):
         self.build_contributor_name()
