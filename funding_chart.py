@@ -290,6 +290,9 @@ def generate_committee_chart(committee_name, committee_id, support_oppose, spend
     nodes_c = gen_nodes(candidate, 0, 0)
     edges += list(set(edges_c))
     nodes += list(set(nodes_c))
+    if len(nodes) <= 4:
+        # Do no post really simple funding charts
+        return
     formated_amount = format_amount(spend_amount)
     filename = generate_graphviz_via_api(nodes, edges, upper=f'Where did {committee.committee_name} get {formated_amount}', lower=f'to {support_oppose} {candidate.candidate_name}?')
     return filename

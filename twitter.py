@@ -683,7 +683,8 @@ FEC filing: {short_url}
             self.schedule_e['expenditure_amount'],
             self.candidate_name
         )
-
+        if filename is None:
+            reply_tweet.handle_build_error(f'No funding chart generated.')
         reply_tweet.upload_media_from_file(filename)
         reply_tweet.text = f'How {self.committee_name} raised {self.amount} to {self.os} {self.candidate_name} 👇'
         reply_tweet.in_reply_to_tweet_id = self.response.data['id']
