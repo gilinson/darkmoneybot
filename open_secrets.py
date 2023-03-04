@@ -22,8 +22,8 @@ def get_committee_info(committee_id, cycle):
     soup = BeautifulSoup(html, 'html.parser')
 
     text = soup.get_text()
-    viewpoint_search = re.search('Viewpoint:(.*)Type of group:', text)
-    supports_search = re.search('Supports:(.*)Grand Total Spent on 2022 Federal Elections:', text)
+    viewpoint_search = re.search('Viewpoint:(.*)\nType of group:', text)
+    supports_search = re.search('Supports:(.*)\nGrand Total Spent on 2022 Federal Elections:', text)
 
     if viewpoint_search is not None:
         viewpoint = viewpoint_search.group(1).strip()

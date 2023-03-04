@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     tweets_a = fetch_schedule_a_data_and_build_tweets(
        min_load_date=min_load_date.strftime('%Y-%m-%d'),
-       min_amount=2.5e5,
+       min_amount=1e5,
        contributor_type='individual',
        transactions=transactions,
        post_cap=POST_CAP
