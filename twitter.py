@@ -122,8 +122,7 @@ class Tweet:
         pass
 
     def build_hashtags(self):
-        self.hashtags.append('Election2022')
-        self.hashtags.append('Midterms')
+        self.hashtags.append('Election2024')
         self.hashtags.append('Vote')
 
 class ScheduleATweet(Tweet):
