@@ -83,7 +83,7 @@ def get_schedule_a(min_load_date, min_amount, **kwargs):
     :return: response
     """
     #two_year_transaction_period = get_two_year_transaction_period(datetime.strptime(min_load_date, '%Y-%M-%d').year)
-    two_year_transaction_period = 2022 # TODO
+    two_year_transaction_period = 2024
     results = get_paged_results(
         endpoint=endpoints['schedule_a'],
         min_load_date=min_load_date,

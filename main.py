@@ -15,8 +15,8 @@ if __name__ == "__main__":
     run_level = args['run_level']
 
     logging.info(f'Run level: {run_level}')
-    min_load_date = datetime.now() - timedelta(days=1)
-    min_dis_date = datetime.now() - timedelta(days=3)
+    min_load_date = datetime.now() - timedelta(days=10)
+    min_dis_date = datetime.now() - timedelta(days=30)
     min_file_date = datetime.now() - timedelta(days=14)
 
     total_posts = 0
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         min_filing_date=min_file_date.strftime('%Y-%m-%d'),
         min_load_date=min_load_date.strftime('%Y-%m-%d'),
         min_dissemination_date=min_dis_date.strftime('%Y-%m-%d'),
-        min_amount=1e5,
+        min_amount=5e4,
         transactions=transactions,
         post_cap=POST_CAP
     )
