@@ -16,6 +16,7 @@ from fec_api import get_schedule_a, get_schedule_e, get_committee, get_affiliate
 from open_secrets import get_committee_info
 from funding_chart import generate_committee_chart
 from wikipedia import get_image
+from open_ai import generate_tweet
 from states import abbrev_to_us_state
 from credentials import twitter_keys
 
@@ -125,6 +126,7 @@ class Tweet:
         self.hashtags.append('Election2024')
         self.hashtags.append('Vote')
 
+
 class ScheduleATweet(Tweet):
     base_string = """According to a new filing {contributor_name} gave {amount} to {recipient}, {recipient_description}.
 
@@ -137,6 +139,8 @@ FEC filing: {short_url}
 
 {hashtags}
 """
+
+    base_string_input = """According to a new filing {contributor_name} gave {amount} to {recipient}, {recipient_description}."""
 
     def __init__(self, schedule_a):
 
@@ -160,7 +164,6 @@ FEC filing: {short_url}
         self.candidate_description = None
         self.committee_website = None
         self.transaction_id = self.transaction_id = f"{self.schedule_a['transaction_id']}{self.schedule_a['committee']['committee_id']}-{self.schedule_a['contribution_receipt_amount']}"
-
 
     def build_contributor_name(self):
         """
@@ -306,7 +309,7 @@ FEC filing: {short_url}
 
     def build_hashtags(self):
         super().build_hashtags()
-        #if self.state_name is not None and self.state_name != 'US':
+        # if self.state_name is not None and self.state_name != 'US':
         #    self.hashtags.append(self.state_name.replace(' ', ''))
         if self.state_name is not None and self.state_name != 'US' and self.office is not None:
             state_race = self.state_name + self.office
@@ -326,47 +329,55 @@ FEC filing: {short_url}
             self.emoji = '⭐'
 
     def build_tweet_string(self):
-        self.text = self.base_string.format(
+        input_string = self.base_string_input.format(
             contributor_name=self.contributor_name,
             amount=self.amount,
             recipient=self.recipient,
-            recipient_description=self.recipient_description,
-            short_url=self.short_url,
-            hashtags=self.hashtags
+            recipient_description=self.recipient_description
         )
 
-        if self.emoji is not None:
-            self.text = self.emoji + ' ' + self.text
+        logging.info('Generating tweet with chatapi')
+        tweet_string = generate_tweet(input_string, self.short_url)
 
+        self.text = tweet_string + ' ' + self.hashtags
         self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
 
-        # TODO clean up this very hacky fix
-        if len(self.text) > 280:
-            logging.info(f'Removing link because tweet is too long. {self.short_url}')
-            self.text = self.base_string_no_disclosure_url.format(
-                contributor_name=self.contributor_name,
-                amount=self.amount,
-                recipient=self.recipient,
-                recipient_description=self.recipient_description,
-                hashtags=self.hashtags
-            )
-
-            if self.emoji is not None:
-                self.text = self.emoji + ' ' + self.text
+        # if self.emoji is not None:
+        #     self.text = self.emoji + ' ' + self.text
+        #
+        # self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
+        #
+        # # TODO clean up this very hacky fix
+        # if len(self.text) > 280:
+        #     logging.info(f'Removing link because tweet is too long. {self.short_url}')
+        #     self.text = self.base_string_no_disclosure_url.format(
+        #         contributor_name=self.contributor_name,
+        #         amount=self.amount,
+        #         recipient=self.recipient,
+        #         recipient_description=self.recipient_description,
+        #         hashtags=self.hashtags
+        #     )
+        #
+        #     if self.emoji is not None:
+        #         self.text = self.emoji + ' ' + self.text
+        #
+        # if len(self.text) > 280:
+        #     logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
+        #     self.text = self.base_string_no_disclosure_url.format(
+        #         contributor_name=self.contributor_name,
+        #         amount=self.amount,
+        #         recipient=self.recipient,
+        #         recipient_description=self.recipient_description,
+        #         hashtags=''
+        #     )
 
         if len(self.text) > 280:
             logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
-            self.text = self.base_string_no_disclosure_url.format(
-                contributor_name=self.contributor_name,
-                amount=self.amount,
-                recipient=self.recipient,
-                recipient_description=self.recipient_description,
-                hashtags=''
-            )
+            self.text = tweet_string
             self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
 
-            if len(self.text) > 280:
-                self.handle_build_error('Cannot shorten tweet.')
+        if len(self.text) > 280:
+            self.handle_build_error('Cannot shorten tweet.')
 
     def get_committee_media(self):
         committee = get_committee(committee_id=self.schedule_a['committee_id'])
@@ -428,6 +439,8 @@ FEC filing: {short_url}
 
     {hashtags}
     """
+
+    base_string_input = """{committee_name} spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}"""
 
     def __init__(self, schedule_e):
 
@@ -569,7 +582,7 @@ FEC filing: {short_url}
 
     def build_hashtags(self):
         super().build_hashtags()
-        #if self.state_name is not None and self.state_name != 'US':
+        # if self.state_name is not None and self.state_name != 'US':
         #    self.hashtags.append(self.state_name.replace(' ', ''))
         if self.state_name is not None and self.state_name != 'US' and self.office is not None:
             state_race = self.state_name + self.office
@@ -626,52 +639,58 @@ FEC filing: {short_url}
 
     def build_tweet_string(self):
 
-        self.text = self.base_string.format(
+        input_string = self.base_string_input.format(
             committee_name=self.committee_name,
             amount=self.amount,
             date=self.date,
             candidate_name=self.candidate_name,
             candidate_description=self.candidate_description,
             os=self.os,
-            short_url=self.short_url,
-            hashtags=self.hashtags,
-            reason=self.reason,
-            emoji=self.emoji
+            reason=self.reason
         )
 
-        # TODO clean up this very hacky fix
-        if len(self.text) > 280:
-            logging.info(f'Removing link because tweet is too long. {self.short_url}')
-            self.text = self.base_string_no_disclosure_url.format(
-                committee_name=self.committee_name,
-                amount=self.amount,
-                date=self.date,
-                candidate_name=self.candidate_name,
-                candidate_description=self.candidate_description,
-                os=self.os,
-                hashtags=self.hashtags,
-                reason=self.reason,
-                emoji=self.emoji
-            )
+        logging.info('Generating tweet with chatapi')
+        tweet_string = generate_tweet(input_string, self.short_url)
 
-        if len(self.text) > 280:
-            self.text = self.base_string_no_disclosure_url.format(
-                committee_name=self.committee_name,
-                amount=self.amount,
-                date=self.date,
-                candidate_name=self.candidate_name,
-                candidate_description=self.candidate_description,
-                os=self.os,
-                hashtags='',
-                reason=self.reason,
-                emoji=self.emoji
-            )
-            logging.info(f'Removing hashtags because tweet is too long. {self.hashtags}')
-
-        if len(self.text) > 280:
-            self.handle_build_error(f'Tweet is too long: {self.text}')
-
+        self.text = tweet_string + ' ' + self.hashtags
         self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
+
+        # TODO clean up this very hacky fix
+        # if len(self.text) > 280:
+        #     logging.info(f'Removing link because tweet is too long. {self.short_url}')
+        #     self.text = self.base_string_no_disclosure_url.format(
+        #         committee_name=self.committee_name,
+        #         amount=self.amount,
+        #         date=self.date,
+        #         candidate_name=self.candidate_name,
+        #         candidate_description=self.candidate_description,
+        #         os=self.os,
+        #         hashtags=self.hashtags,
+        #         reason=self.reason,
+        #         emoji=self.emoji
+        #     )
+        #
+        # if len(self.text) > 280:
+        #     self.text = self.base_string_no_disclosure_url.format(
+        #         committee_name=self.committee_name,
+        #         amount=self.amount,
+        #         date=self.date,
+        #         candidate_name=self.candidate_name,
+        #         candidate_description=self.candidate_description,
+        #         os=self.os,
+        #         hashtags='',
+        #         reason=self.reason,
+        #         emoji=self.emoji
+        #     )
+        #     logging.info(f'Removing hashtags because tweet is too long. {self.hashtags}')
+
+        if len(self.text) > 280:
+            logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
+            self.text = tweet_string
+            self.text = re.sub(r'[^\S\r\n]+', ' ', self.text)  # Remove any extra white space
+
+        if len(self.text) > 280:
+            self.handle_build_error('Cannot shorten tweet.')
 
     def gen_reply_tweet(self):
         reply_tweet = Tweet()
