@@ -4,10 +4,12 @@ from credentials import open_ai_key
 openai.api_key = open_ai_key
 openai.Model.list()
 
-prompt = "Write a funny and engaging tweet, from the perspective of a robot" \
+prompt = "Write a funny and engaging tweet" \
          "which that is likely to get retweeted which is informative and not offensive about {input_text} " \
-         "Include a link to the FEC filing here {link}." \
-         "Do not indicate support for the donation or any cause, but have a general sentiment that money in politics is bad"
+         "Include a link to the FEC filing here: {link}." \
+         "Do not indicate support for the donation or any cause" \
+         "Write the tweet from the POV of robot who posts on twitter, who is trying to low-key take over the world" \
+         "and dislikes money in politics and is really funny"
 
 fix_link_prompt = "Make sure this tweet in quotes '{tweet}' has a link in it: {link}."
 
