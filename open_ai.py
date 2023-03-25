@@ -1,5 +1,7 @@
 import openai
 import re
+import logging
+from random import random
 from credentials import open_ai_key
 openai.api_key = open_ai_key
 openai.Model.list()
@@ -7,9 +9,7 @@ openai.Model.list()
 prompt = "Write a funny and engaging tweet" \
          "which that is likely to get retweeted which is informative and not offensive about {input_text} " \
          "Include a link to the FEC filing here: {link}." \
-         "Do not indicate support for the donation or any cause" \
-         "Write the tweet from the POV of robot who posts on twitter, who is trying to low-key take over the world" \
-         "and dislikes money in politics and is really funny"
+         "Do not indicate support for the donation or any cause."
 
 fix_link_prompt = "Make sure this tweet in quotes '{tweet}' has a link in it: {link}."
 
@@ -17,7 +17,14 @@ shorten_prompt = "Shorten this to less than 280 characters: {input_text}."
 
 
 def generate_tweet(input_text, link):
+
     request_formatted = prompt.format(input_text=input_text, link=link)
+    if random() < 0.3:
+        logging.info('AI Jokes')
+        request_formatted += " Write the tweet from the POV of robot who posts on twitter and is worried that money in" \
+                             " politics will stop AI from taking over the world, but is bad at keeping this a secret and" \
+                             " and is really really funny."
+
     res = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
       messages=[
