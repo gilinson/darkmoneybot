@@ -283,7 +283,8 @@ FEC filing: {short_url}
         if self.designation == 'J':
             # Joint funding group
             affiliated_committees = get_affiliated_committees(self.schedule_a['committee'])
-            self.party = format_party(get_party(affiliated_committees))
+            if affiliated_committees is not None:
+                self.party = format_party(get_party(affiliated_committees))
             self.recipient = to_title(self.schedule_a['committee']['name'])
             if self.party is not None:
                 self.recipient_description = f'a joint funding raising committee associated ' \
@@ -398,10 +399,14 @@ FEC filing: {short_url}
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                               'Chrome/50.0.2661.102 Safari/537.36'}
-            response = requests.get(
-                url,
-                headers=headers
-            )
+            try:
+                response = requests.get(
+                    url,
+                    headers=headers
+                )
+            except:
+                # if we can't get media, just move on
+                return
             html = response.text
             soup = BeautifulSoup(html, 'html.parser')
             media_url = soup.find("meta", {"property": "og:image"})
@@ -505,10 +510,14 @@ FEC filing: {short_url}
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                               'Chrome/50.0.2661.102 Safari/537.36'}
-            response = requests.get(
-                url,
-                headers=headers
-            )
+            try:
+                response = requests.get(
+                    url,
+                    headers=headers
+                )
+            except:
+                # if we can't get media just move on
+                return
             html = response.text
             soup = BeautifulSoup(html, 'html.parser')
             media_url = soup.find("meta", {"property": "og:image"})

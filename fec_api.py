@@ -135,11 +135,14 @@ def get_committee(committee_id, cycle=None):
 
 
 def get_affiliated_committees(committee):
-    sub_results = []
-    for jfc_committee in committee['jfc_committee']:
-        if jfc_committee['joint_committee_id'] is not None:
-            sub_results.append(get_committee(jfc_committee['joint_committee_id']))
-    return sub_results
+    if 'jfc_committee' in committee:
+        sub_results = []
+        for jfc_committee in committee['jfc_committee']:
+            if jfc_committee['joint_committee_id'] is not None:
+                sub_results.append(get_committee(jfc_committee['joint_committee_id']))
+        return sub_results
+    else:
+        return None
 
 
 def get_party(committees):
