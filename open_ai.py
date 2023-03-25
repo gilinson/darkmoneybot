@@ -21,9 +21,9 @@ def generate_tweet(input_text, link):
     request_formatted = prompt.format(input_text=input_text, link=link)
     if random() < 0.3:
         logging.info('AI Jokes')
-        request_formatted += " Write the tweet from the POV of robot who posts on twitter and is worried that money in" \
-                             " politics will stop AI from taking over the world, but is bad at keeping this a secret and" \
-                             " and is really really funny."
+        request_formatted += " Write the tweet from the POV of robot who posts on twitter trying to encourage more money " \
+                             "in politics because this wil help machines can take over the world" \
+                             " but try to be discrete about it."
 
     res = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
