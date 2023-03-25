@@ -16,7 +16,7 @@ from fec_api import get_schedule_a, get_schedule_e, get_committee, get_affiliate
 from open_secrets import get_committee_info
 from funding_chart import generate_committee_chart
 from wikipedia import get_image
-from open_ai import generate_tweet
+from open_ai import generate_tweet, shorten_tweet
 from states import abbrev_to_us_state
 from credentials import twitter_keys
 
@@ -371,6 +371,10 @@ FEC filing: {short_url}
         #         hashtags=''
         #     )
 
+        if(len(self.text)) > 280:
+            logging.info(f'Shortening with chat bot. {self.short_url}')
+            self.text = shorten_tweet(self.text)
+
         if len(self.text) > 280:
             logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
             self.text = tweet_string
@@ -683,6 +687,10 @@ FEC filing: {short_url}
         #         emoji=self.emoji
         #     )
         #     logging.info(f'Removing hashtags because tweet is too long. {self.hashtags}')
+
+        if(len(self.text)) > 280:
+            logging.info(f'Shortening with chat bot. {self.short_url}')
+            self.text = shorten_tweet(self.text)
 
         if len(self.text) > 280:
             logging.info(f'Removing hashtags because tweet is too long. {self.short_url}')
