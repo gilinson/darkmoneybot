@@ -438,7 +438,6 @@ FEC filing: {short_url}
         self.build_disclosure_url()
         self.build_hashtags()
         self.get_contributor_media()
-        self.get_committee_media()
         self.build_tweet_string()
 
 
@@ -486,7 +485,6 @@ FEC filing: {short_url}
         self.build_date()
         self.build_candidate()
         self.build_candidate_description()
-        self.get_committee_media()
         self.build_hashtags()
         self.build_os()
         self.build_emoji()
@@ -499,7 +497,6 @@ FEC filing: {short_url}
         self.committee_name = format_committee_name(self.committee_name)
 
     def get_committee_media(self):
-        # TODO copy-paste
         committee = get_committee(committee_id=self.schedule_e['committee_id'])
         self.committee_website = committee['website']
         if self.committee_website is not None:
