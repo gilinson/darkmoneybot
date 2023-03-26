@@ -6,10 +6,10 @@ from credentials import open_ai_key
 openai.api_key = open_ai_key
 openai.Model.list()
 
-prompt = "Write a funny and engaging tweet" \
+prompt = "Write a funny and engaging tweet using emoji " \
          "which that is likely to get retweeted which is informative and not offensive about {input_text} " \
          "Include a link to the FEC filing here: {link}." \
-         "Do not indicate support for the donation or any cause."
+         "Do not indicate support for the donation or any cause or say anything bad about liberals or conservatives."
 
 fix_link_prompt = "Make sure this tweet in quotes '{tweet}' has a link in it: {link}."
 
@@ -19,7 +19,7 @@ shorten_prompt = "Shorten this to less than 280 characters: {input_text}."
 def generate_tweet(input_text, link):
 
     request_formatted = prompt.format(input_text=input_text, link=link)
-    if random() < 0.3:
+    if random() < 0.1:
         logging.info('AI Jokes')
         request_formatted += " Write the tweet from the POV of robot who posts on twitter trying to encourage more money " \
                              "in politics because this wil help machines can take over the world" \
