@@ -130,7 +130,6 @@ class Tweet:
 class ScheduleATweet(Tweet):
     base_string = """According to a new filing {contributor_name} gave {amount} to {recipient}, {recipient_description}.
 
-FEC filing: {short_url}
 {hashtags}
 """
 
@@ -444,7 +443,6 @@ FEC filing: {short_url}
 class ScheduleETweet(Tweet):
     base_string = """{emoji} {committee_name} spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}
 
-FEC filing: {short_url}
 {hashtags}
 """
     base_string_no_disclosure_url = """{emoji} {committee_name} spent {amount} for {reason} starting {date} to {os} {candidate_name}, {candidate_description}

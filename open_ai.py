@@ -37,15 +37,15 @@ def generate_tweet(input_text, link):
     # make sure we included a link, if not ask chatbot to edit
     link_pattern = re.compile(r'https?://\S+')
     match = link_pattern.search(tweet)
-    if not match:
-        request_formatted = fix_link_prompt.format(tweet=tweet, link=link)
-        res = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": request_formatted}
-            ]
-        )
-        tweet = res.choices[0].message.content
+   # if not match:
+   #     request_formatted = fix_link_prompt.format(tweet=tweet, link=link)
+   #     res = openai.ChatCompletion.create(
+   #         model="gpt-3.5-turbo",
+   #         messages=[
+   #             {"role": "user", "content": request_formatted}
+   #         ]
+   #     )
+   #     tweet = res.choices[0].message.content
 
     tweet = re.sub(r'^"|"$', '', tweet) # remove quotes
     tweet = re.sub(r'[^\S\r\n]+', ' ', tweet) # drop whitespace
