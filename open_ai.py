@@ -10,6 +10,7 @@ prompt = "Write a funny and engaging tweet using emoji " \
          "which that is likely to get retweeted which is informative and not offensive about {input_text} " \
          "Do not indicate support for the donation or any cause or say anything bad about liberals or conservatives."
 
+
 fix_link_prompt = "Make sure this tweet in quotes '{tweet}' has a link in it: {link}."
 
 shorten_prompt = "Shorten this to less than 280 characters: {input_text}."
