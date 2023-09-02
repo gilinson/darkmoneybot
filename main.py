@@ -46,6 +46,9 @@ if __name__ == "__main__":
                 logging.info(error)
         else:
             logging.info(f'Skipping {tweet.transaction_id} because {tweet.build_issues}')
+            with open('transactions.csv', 'a') as csv_file:
+                writer_object = csv.writer(csv_file)
+                writer_object.writerow([tweet.transaction_id])
 
     tweets_e = fetch_schedule_e_data_and_build_tweets(
         min_filing_date=min_file_date.strftime('%Y-%m-%d'),
@@ -64,6 +67,9 @@ if __name__ == "__main__":
                 logging.info(error)
         else:
             logging.info(f'Skipping {tweet.transaction_id} because {tweet.build_issues}')
+            with open('transactions.csv', 'a') as csv_file:
+                writer_object = csv.writer(csv_file)
+                writer_object.writerow([tweet.transaction_id])
 
     for tweet in tweets_e:
         if tweet.status == TweetStatus.POSTED:
