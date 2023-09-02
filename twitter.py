@@ -304,6 +304,9 @@ class ScheduleATweet(Tweet):
             self.candidate_description = f'{self.party} candidate for President'
 
     def build_disclosure_url(self):
+        if len(self.build_issues) > 0:
+            return
+
         self.disclosure_url = self.schedule_a['pdf_url']
         self.short_url = get_short_url(self.disclosure_url)
 
@@ -600,6 +603,9 @@ class ScheduleETweet(Tweet):
             self.handle_build_error('support_oppose_indicator is missing')
 
     def build_disclosure_url(self):
+        if len(self.build_issues) > 0:
+            return
+
         self.disclosure_url = self.schedule_e['pdf_url']
         self.short_url = get_short_url(self.disclosure_url)
 
