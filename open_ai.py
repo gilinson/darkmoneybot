@@ -6,7 +6,7 @@ from credentials import open_ai_key
 openai.api_key = open_ai_key
 openai.Model.list()
 
-prompt = "You are a serious news reporter." \
+prompt = "You are a serious news reporter, reporting on the 2024 election." \
          "Write an and engaging tweet less than 280 characters " \
          "which that is likely to get retweeted which is informative and not offensive about '{input_text}' " \
          "Do not indicate support for the donation or any cause or say anything bad about liberals or conservatives."
