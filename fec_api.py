@@ -163,6 +163,9 @@ def get_candidate(multi=False, **kwargs):
         endpoint=endpoints['candidate'],
         **kwargs
     )
+    if len(results) == 0:
+        return None
+
     if not multi:
         parsed_name = HumanName(results[0]['name'])
         results[0]['first_name'] = parsed_name.first
