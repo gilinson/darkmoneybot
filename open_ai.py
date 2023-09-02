@@ -46,7 +46,7 @@ def generate_tweet(input_text, link):
         #)
         #tweet = res.choices[0].message.content
 
-    tweet = re.sub(r'^"|"$', '', tweet) # remove quotes
+    tweet = re.sub(r'"', '', tweet) # remove quotes
     tweet = re.sub(r'[^\S\r\n]+', ' ', tweet) # drop whitespace
 
     ai_pattern = re.compile(r'AI\s+language\s+model', re.IGNORECASE)
@@ -70,6 +70,6 @@ def shorten_tweet(input_text, link):
     match = link_pattern.search(tweet)
     if not match:
         tweet = tweet + ' ' + link
-    tweet = re.sub(r'^"|"$', '', tweet)  # remove quotes
+    tweet = re.sub(r'"', '', tweet)  # remove quotes
     tweet = re.sub(r'[^\S\r\n]+', ' ', tweet)  # drop whitespace
     return tweet
